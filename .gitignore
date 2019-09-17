@@ -1,0 +1,5 @@
+*.wt
+*.lock
+diagnistic.data/
+journal/
+db/

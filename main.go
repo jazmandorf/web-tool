@@ -30,10 +30,11 @@ func main() {
 		templates: template.Must(template.ParseGlob(`./src/views/*.html`)),
 	}
 	e.Renderer = renderer
-	e.Handle
+
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "template.html", map[string]interface{}{
-			"name": "Dolly!",
+			"name":    "Dolly!",
+			"reverse": 1234,
 		})
 	}).Name = "foobar"
 

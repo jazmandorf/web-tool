@@ -3,5 +3,6 @@
 diagnistic.data/
 journal/
 db/
-src/model/data/db/diagnostic.data/metrics.interim
+*.interim
 src/model/data/db/diagnostic.data/metrics.2019-09-09T02-11-38Z-00000
+

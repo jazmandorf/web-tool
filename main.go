@@ -36,13 +36,19 @@ func main() {
 			"name":    "Dolly!",
 			"reverse": 1234,
 		})
-	}).Name = "foobar"
+	})
 
-	e.POST("/hello", func(c echo.Context) error {
-		return c.Render(200, "hello.html", map[string]interface{}{
-			"hello": 1234,
+	e.GET("/hello", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "hello.html", map[string]interface{}{
+			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})
 	e.Logger.Fatal(e.Start(":1234"))
 
+}
+
+type myStruct struct {
+	Name   string
+	Age    int
+	Height int
 }

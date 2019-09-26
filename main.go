@@ -51,9 +51,11 @@ func main() {
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})
+
 	e.GET("/initial", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "form_wizard.html", map[string]interface{}{})
 	})
+
 	e.GET("/dashboard2", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "dashboard_3.html", map[string]interface{}{
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},

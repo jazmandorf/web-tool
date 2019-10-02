@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -10,6 +11,11 @@ import (
 
 func init() {
 
+}
+
+type user struct {
+	Name  string `json:"name" form:"name" query:"name"`
+	Email string `json:"email" form:"email" query:"email"`
 }
 
 type TemplateRender struct {
@@ -61,6 +67,19 @@ func main() {
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})
+
+	e.POST("/testPost", func(c echo.Context) error {
+		return c.String(http.StatusOK, "testPost")
+	})
+
+	e.GET("/getTest", func(c echo.Context) error {
+		u := new(user)
+		if err := c.Bind(u); err != nil {
+			log.Fatal(err)
+		}
+		return c.JSON(http.StatusOK, u)
+	})
+
 	e.Logger.Fatal(e.Start(":1234"))
 
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -78,6 +79,18 @@ func main() {
 			log.Fatal(err)
 		}
 		return c.JSON(http.StatusOK, u)
+	})
+
+	e.GET("/getHtml", func(c echo.Context) error {
+		res, err := http.NewRequest("GET", "http://localhost:1234/initial", nil)
+		defer res.Body.Close()
+
+		data, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		return c.HTML(200, string(data))
 	})
 
 	e.Logger.Fatal(e.Start(":1234"))

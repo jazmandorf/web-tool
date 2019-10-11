@@ -83,11 +83,15 @@ func main() {
 
 	e.GET("/getHtml", func(c echo.Context) error {
 		res, err := http.NewRequest("GET", "http://localhost:1234/initial", nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		defer res.Body.Close()
 
 		data, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		return c.HTML(200, string(data))

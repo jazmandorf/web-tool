@@ -1,8 +1,11 @@
 package main
 
 import (
+	"container/list"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -41,6 +44,7 @@ func main() {
 	s := Student{"Dennis", 32, []string{"jazmandorf", "thaeao", "wlqkrdl"}}
 
 	t := template.New("person template")
+	//te := template.p
 
 	t, err := t.Parse(tmpl)
 
@@ -52,6 +56,19 @@ func main() {
 
 	if err1 != nil {
 		log.Fatal(err1)
+	}
+
+	items := list.New()
+	for _, x := range strings.Split("ABCDEFGH", "") {
+		fmt.Println(x)
+		items.PushBack(x)
+	}
+
+	e := items.PushFront(0)
+	items.InsertAfter(1, e)
+
+	for element := items.Front(); element != nil; element = element.Next() {
+		fmt.Printf("%v ", element.Value)
 	}
 
 }

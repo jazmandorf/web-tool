@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -91,6 +92,7 @@ func main() {
 		client := &http.Client{}
 		res, err := client.Do(req)
 		if err != nil {
+			fmt.Println("에러1")
 			log.Fatal(err)
 		}
 
@@ -98,10 +100,13 @@ func main() {
 
 		data, err := ioutil.ReadAll(res.Body)
 		if err != nil {
+			fmt.Println("에러2")
 			log.Fatal(err)
 		}
+		fmt.Println("data : ", data)
 
-		return c.HTML(200, string(data))
+		//return c.HTML(200, string(data))
+		return c.String(http.StatusOK, "gethtml")
 	})
 
 	e.Logger.Fatal(e.Start(":1234"))

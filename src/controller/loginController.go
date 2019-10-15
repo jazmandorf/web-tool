@@ -1,4 +1,4 @@
-package controlloer
+package controller
 
 import (
 	_ "fmt"
@@ -12,7 +12,7 @@ type LoginInfo struct {
 	Pass  string
 }
 
-func Login(c echo.Context) LoginInfo {
+func loginController(c echo.Context) LoginInfo {
 	loginInfo := LoginInfo{}
 	loginInfo.Email = c.FormValue("email")
 	loginInfo.Pass = c.FormValue("pass")

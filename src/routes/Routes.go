@@ -5,6 +5,11 @@ import (
 )
 
 type Route struct {
-	method, path string
-	function     echo.HandlerFunc
+	Method, Path string
+	Function     echo.HandlerFunc
 }
+
+const (
+	CbDriverURL  = "http://localhost"
+	CbDriverPort = "1234"
+)

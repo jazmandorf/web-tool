@@ -49,7 +49,7 @@ func main() {
 	})
 
 	e.GET("/hello", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "hello.html", map[string]interface{}{
+		return c.Render(http.StatusOK, "hello", map[string]interface{}{
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})
@@ -82,8 +82,33 @@ func main() {
 		return c.JSON(http.StatusOK, u)
 	})
 
+	e.GET("/getJson", func(c echo.Context) error {
+		url := `"http//localhost:1234/getTest?email=jazmandorf@gmail.com&name=Dennis"`
+
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+		client := &http.Client{}
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println("에러1")
+			log.Fatal(err)
+		}
+
+		defer res.Body.Close()
+
+		data, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			fmt.Println("에러2")
+			log.Fatal(err)
+		}
+		fmt.Println("data : ", data)
+		return c.String(http.StatusOK, "gethtml")
+	})
+
 	e.GET("/getHtml", func(c echo.Context) error {
-		url := "http//localhost:1234/initial"
+		url := "http//localhost:1234/getTest"
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			log.Fatal(err)

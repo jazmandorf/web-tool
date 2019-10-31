@@ -35,18 +35,21 @@ func (t *TemplateRender) Render(w io.Writer, name string, data interface{}, c ec
 func main() {
 	e := echo.New()
 	e.Static("/assets", "./src/static/assets")
+
+	// paresGlob 를 사용하여 모든 경로에 있는 파일을 가져올 경우 사용하면 되겠다.
+	// 사용한다음에 해당 파일을 불러오면 되네.
 	renderer := &TemplateRender{
 		templates: template.Must(template.ParseGlob(`./src/views/*.html`)),
 	}
+
 	e.Renderer = renderer
 
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "template.html", map[string]interface{}{
 			"name":    "Dolly!",
 			"reverse": 1234,
-			"foobar":  "",
 		})
-	})
+	}).Name = "foobar"
 
 	e.GET("/hello", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "hello", map[string]interface{}{

@@ -32,6 +32,10 @@ func (t *TemplateRender) Render(w io.Writer, name string, data interface{}, c ec
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
+func requestDriver(method string, restUrl string, body io.Reader) {
+
+}
+
 func main() {
 	e := echo.New()
 	e.Static("/assets", "./src/static/assets")
@@ -45,6 +49,25 @@ func main() {
 	e.Renderer = renderer
 
 	e.GET("/", func(c echo.Context) error {
+		defer func() {
+			if e := recover(); e != nil {
+				fmt.Printf("error : %s\r\n ", e)
+			}
+		}()
+		proxyReq, err := http.NewRequest("GET", "http://localhost:1024/connectionconfig", nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+		client := &http.Client{}
+		proxyRes, err := client.Do(proxyReq)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer proxyRes.Body.Close()
+
+		bytes, _ := ioutil.ReadAll(proxyRes.Body)
+		fmt.Println("result : ", string(bytes))
+
 		return c.Render(http.StatusOK, "template.html", map[string]interface{}{
 			"name":    "Dolly!",
 			"reverse": 1234,

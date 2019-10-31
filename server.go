@@ -47,6 +47,7 @@ func main() {
 	//te := template.p
 
 	t, err := t.Parse(tmpl)
+	t.ParseFiles()
 
 	if err != nil {
 		log.Fatal(err)

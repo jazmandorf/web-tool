@@ -53,7 +53,7 @@ func main() {
 	// paresGlob 를 사용하여 모든 경로에 있는 파일을 가져올 경우 사용하면 되겠다.
 	// 사용한다음에 해당 파일을 불러오면 되네.
 	renderer := &TemplateRender{
-		templates: template.Must(template.ParseGlob(`./src/views/*.html`)),
+		templates: template.Must(template.ParseGlob(`./src/views/*`)),
 	}
 
 	e.Renderer = renderer

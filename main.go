@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo"
 )
 
@@ -18,6 +20,14 @@ func init() {
 type user struct {
 	Name  string `json:"name" form:"name" query:"name"`
 	Email string `json:"email" form:"email" query:"email"`
+}
+
+type connectionInfo struct {
+	RegionName     string `json:"regionname"`
+	ConfigName     string
+	ProviderName   string `json:"ProviderName"`
+	CredentialName string `json:"CredentialName"`
+	DriverName     string `json:"DriverName"`
 }
 
 type TemplateRender struct {
@@ -54,6 +64,7 @@ func main() {
 				fmt.Printf("error : %s\r\n ", e)
 			}
 		}()
+		//panic("test")
 		proxyReq, err := http.NewRequest("GET", "http://localhost:1024/connectionconfig", nil)
 		if err != nil {
 			log.Fatal(err)
@@ -63,11 +74,16 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		defer proxyRes.Body.Close()
-
-		bytes, _ := ioutil.ReadAll(proxyRes.Body)
-		fmt.Println("result : ", string(bytes))
-
+		var cInfo []connectionInfo
+		e := json.NewDecoder(proxyRes.Body).Decode(&cInfo)
+		if e != nil {
+			//http.Error(w, e.Error(), http.StatusBadRequest)
+			log.Fatal(e)
+		}
+		fmt.Println("bind :", cInfo[0])
+		spew.Dump(cInfo)
 		return c.Render(http.StatusOK, "template.html", map[string]interface{}{
 			"name":    "Dolly!",
 			"reverse": 1234,
@@ -81,7 +97,7 @@ func main() {
 	})
 
 	e.GET("/dashboard", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "dashboard_2.html", map[string]interface{}{
+		return c.Render(http.StatusOK, "dashboard.html", map[string]interface{}{
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})
@@ -94,6 +110,9 @@ func main() {
 		return c.Render(http.StatusOK, "dashboard_3.html", map[string]interface{}{
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
+	})
+	e.GET("/login", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "login.html", nil)
 	})
 
 	e.POST("/testPost", func(c echo.Context) error {

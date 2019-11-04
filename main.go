@@ -68,12 +68,12 @@ func main() {
 		//panic("test")
 		proxyReq, err := http.NewRequest("GET", "http://localhost:1024/connectionconfig", nil)
 		if err != nil {
-			log.Fatal(err)
+			//log.Fatal(err)
 		}
 		client := &http.Client{}
 		proxyRes, err := client.Do(proxyReq)
 		if err != nil {
-			log.Fatal(err)
+			//log.Fatal(err)
 		}
 
 		defer proxyRes.Body.Close()
@@ -81,7 +81,7 @@ func main() {
 		e := json.NewDecoder(proxyRes.Body).Decode(&cInfo)
 		if e != nil {
 			//http.Error(w, e.Error(), http.StatusBadRequest)
-			log.Fatal(e)
+			//log.Fatal(e)
 		}
 		fmt.Println("bind :", cInfo[0])
 		spew.Dump(cInfo)
@@ -105,6 +105,12 @@ func main() {
 
 	e.GET("/MCIS/register", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "MCISRegister.html", map[string]interface{}{
+			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
+		})
+	})
+
+	e.GET("/MCIS/list", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "MCISlist.html", map[string]interface{}{
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})

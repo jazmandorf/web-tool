@@ -52,8 +52,9 @@ func main() {
 
 	// paresGlob 를 사용하여 모든 경로에 있는 파일을 가져올 경우 사용하면 되겠다.
 	// 사용한다음에 해당 파일을 불러오면 되네.
+	// 서브디렉토리에 있는 걸 확인하기가 힘드네....
 	renderer := &TemplateRender{
-		templates: template.Must(template.ParseGlob(`./src/views/*`)),
+		templates: template.Must(template.ParseGlob(`./src/views/*.html`)),
 	}
 
 	e.Renderer = renderer
@@ -98,6 +99,12 @@ func main() {
 
 	e.GET("/dashboard", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "dashboard.html", map[string]interface{}{
+			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
+		})
+	})
+
+	e.GET("/MCIS/register", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "MCISRegister.html", map[string]interface{}{
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})

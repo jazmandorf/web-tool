@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 )
@@ -71,5 +72,8 @@ func main() {
 	for element := items.Front(); element != nil; element = element.Next() {
 		fmt.Printf("%v ", element.Value)
 	}
-
+	filepath.Walk("./src/views/", func(path string, info os.FileInfo, err error) error {
+		fmt.Println(info.Name())
+		return nil
+	})
 }

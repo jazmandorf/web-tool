@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	echosession "github.com/go-session/echo-session"
@@ -13,6 +14,10 @@ import (
 type LoginInfo struct {
 	Email string
 	Pass  string
+}
+type ReqInfo struct {
+	UserName string `json:"username"`
+	Password string `json:"password"`
 }
 
 func MakeNameSpace(name string) string {
@@ -25,12 +30,19 @@ func MakeNameSpace(name string) string {
 }
 
 func RegUserConrtoller(c echo.Context) error {
-	user := c.FormValue("username")
-	pass := c.FormValue("password")
-	fmt.Println("c.Request : ", c.Request())
+
+	reqInfo := new(ReqInfo)
+	if err := c.Bind(reqInfo); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "fail",
+		})
+	}
+	user := reqInfo.UserName
+	pass := reqInfo.Password
+	fmt.Println("c.Request : ", user, pass)
 	store := echosession.FromContext(c)
 	get, ok := store.Get(user)
-	fmt.Println("GET store : ", get)
+	fmt.Println(get)
 	obj := map[string]string{
 		"username":  user,
 		"namespace": MakeNameSpace(user),
@@ -57,21 +69,47 @@ func RegUserConrtoller(c echo.Context) error {
 }
 
 func LoginController(c echo.Context) error {
-
-	getUser := c.FormValue("username")
-	getPass := c.FormValue("password")
 	store := echosession.FromContext(c)
-	fmt.Println("c.Request : ", c.Request())
-
-	fmt.Println(getUser, getPass)
+	reqInfo := new(ReqInfo)
+	if err := c.Bind(reqInfo); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "fail",
+		})
+	}
+	getUser := strings.TrimSpace(reqInfo.UserName)
+	getPass := strings.TrimSpace(reqInfo.Password)
+	fmt.Println("getUser & getPass : ", getUser, getPass)
 
 	get, ok := store.Get(getUser)
-	fmt.Println("getObj1 :", get)
+	fmt.Println("GEt USER:", get)
 	if !ok {
 		return c.JSON(http.StatusNotFound, map[string]string{
 			"message": " 정보가 없으니 다시 등록 해라",
+			"status":  "fail",
 		})
 	}
+	result := map[string]string{}
+	for k, v := range get.(map[string]string) {
+		fmt.Println(k, v)
+		result[k] = v
+
+	}
+
+	fmt.Println("result : ", result["password"])
+	if result["password"] == getPass && result["username"] == getUser {
+		store.Set("username", result["username"])
+		store.Save()
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "Login Success",
+			"status":  "success",
+		})
+	} else {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "wrong password of ID",
+			"status":  "fail",
+		})
+	}
+
 	// var result map[string]string
 	// for k, item := range getObj {
 	// 	fmt.Println("GetItem : ", item)
@@ -87,7 +125,5 @@ func LoginController(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{
 		"message": "success",
 		"status":  "200",
-		"user":    getUser,
-		"pass":    getPass,
 	})
 }

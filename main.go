@@ -65,7 +65,15 @@ func main() {
 	e.Renderer = renderer
 
 	e.GET("/", func(c echo.Context) error {
-
+		store := echosession.FromContext(c)
+		get, ok := store.Get("username")
+		fmt.Println(get)
+		if !ok {
+			fmt.Println("nothing ")
+			return c.Redirect(200, "/login")
+		} else {
+			return c.Redirect(http.StatusAccepted, "/dashboard")
+		}
 		defer func() {
 			if e := recover(); e != nil {
 				fmt.Printf("error : %s\r\n ", e)

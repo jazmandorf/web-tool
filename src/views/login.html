@@ -7,6 +7,8 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" />
+        <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <!-- https://fontawesome.com/cheatsheet -->
 
         <link rel="stylesheet" href="../assets/css/custom.css">
@@ -24,18 +26,18 @@
                                 <form role="form">
                                     <div class="form-group mb-4">
                                         <div class="input-group input-id">
-                                            <input class="form-control form-control-lg" placeholder="Email" type="email">
+                                            <input class="form-control form-control-lg" placeholder="Email" type="text" id="email">
                                             <i class="fas fa-envelope"></i>
                                         </div>
                                     </div>
                                     <div class="form-group mb-4">
                                         <div class="input-group input-password">
-                                            <input class="form-control form-control-lg" placeholder="Password" type="password">
+                                            <input class="form-control form-control-lg" placeholder="Password" type="password" id="password">
                                             <i class="fas fa-key"></i>
                                         </div>
                                     </div>
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-dark btn-lg btn-block">Sign in</button>
+                                        <button type="button" id="sign_btn" class="btn btn-dark btn-lg btn-block">Sign in</button>
                                     </div>
                                 </form>
                             </div>
@@ -46,3 +48,44 @@
         </div>
     </body>
 </html>
+<script>
+$(document).ready(function(){
+    axios.post("/regUser",{headers: { 'Content-type': 'application/json', }, 
+        username:"thaeao",password:"jys1007"
+     }).then(result =>{
+            console.log(result);
+        });
+    $("#sign_btn").click(function(){
+       // alert("test")
+        var username = $("#email").val();
+        var password = $("#password").val();
+        var req = {
+            username : username,
+            password : password,
+        };
+        console.log(req)
+        axios.post("/login/proc",{headers: { 'Content-type': 'application/json', }
+        ,username:username,password:password }).then(result =>{
+            console.log(result);
+            if(result.data.status == "success"){
+                alert("Login Success");
+                location.href ="/dashboard";
+            }
+        });
+        // $.ajax({
+        //     url:"/login/proc/",
+        //     contentType: "application/json",
+        //     data:req,
+        //     method:"POST",
+        
+
+        // }).done(function(data){
+        //     console.log(data)
+        // });
+
+    })
+   
+})
+
+
+</script>

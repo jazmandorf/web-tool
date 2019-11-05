@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -9,8 +8,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/davecgh/go-spew/spew"
+	controller "./src/controller"
+	echosession "github.com/go-session/echo-session"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func init() {
@@ -42,12 +43,16 @@ func (t *TemplateRender) Render(w io.Writer, name string, data interface{}, c ec
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-func requestDriver(method string, restUrl string, body io.Reader) {
+func requestApi(method string, restUrl string, body io.Reader) {
 
 }
 
 func main() {
 	e := echo.New()
+	e.Use(echosession.New())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
 	e.Static("/assets", "./src/static/assets")
 
 	// paresGlob 를 사용하여 모든 경로에 있는 파일을 가져올 경우 사용하면 되겠다.
@@ -60,36 +65,37 @@ func main() {
 	e.Renderer = renderer
 
 	e.GET("/", func(c echo.Context) error {
+
 		defer func() {
 			if e := recover(); e != nil {
 				fmt.Printf("error : %s\r\n ", e)
 			}
 		}()
-		//panic("test")
-		proxyReq, err := http.NewRequest("GET", "http://localhost:1024/connectionconfig", nil)
-		if err != nil {
-			//log.Fatal(err)
-		}
-		client := &http.Client{}
-		proxyRes, err := client.Do(proxyReq)
-		if err != nil {
-			//log.Fatal(err)
-		}
+		// //panic("test")
+		// proxyReq, err := http.NewRequest("GET", "http://localhost:1024/connectionconfig", nil)
+		// if err != nil {
+		// 	//log.Fatal(err)
+		// }
+		// client := &http.Client{}
+		// proxyRes, err := client.Do(proxyReq)
+		// if err != nil {
+		// 	//log.Fatal(err)
+		// }
 
-		defer proxyRes.Body.Close()
-		var cInfo []connectionInfo
-		e := json.NewDecoder(proxyRes.Body).Decode(&cInfo)
-		if e != nil {
-			//http.Error(w, e.Error(), http.StatusBadRequest)
-			//log.Fatal(e)
-		}
-		fmt.Println("bind :", cInfo[0])
-		spew.Dump(cInfo)
+		// defer proxyRes.Body.Close()
+		// var cInfo []connectionInfo
+		// e := json.NewDecoder(proxyRes.Body).Decode(&cInfo)
+		// if e != nil {
+		// 	//http.Error(w, e.Error(), http.StatusBadRequest)
+		// 	//log.Fatal(e)
+		// }
+		// fmt.Println("bind :", cInfo[0])
+		// spew.Dump(cInfo)
 		return c.Render(http.StatusOK, "template.html", map[string]interface{}{
 			"name":    "Dolly!",
 			"reverse": 1234,
 		})
-	}).Name = "foobar"
+	})
 
 	e.GET("/hello", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "hello", map[string]interface{}{
@@ -102,6 +108,9 @@ func main() {
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})
+
+	e.POST("/login/proc", controller.LoginController)
+	e.POST("/regUser", controller.RegUserConrtoller)
 
 	e.GET("/MCIS/register", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "MCISRegister.html", map[string]interface{}{
@@ -116,7 +125,13 @@ func main() {
 	})
 
 	e.GET("/initial", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "form_wizard.html", map[string]interface{}{})
+
+		//fmt.Println("initial err : ", err)
+		// if err != nil {
+		// 	return c.Render(http.StatusOK, "form_wizard.html", nil)
+		// }
+
+		return c.Redirect(http.StatusMovedPermanently, "/dashboard")
 	})
 
 	e.GET("/dashboard2", func(c echo.Context) error {

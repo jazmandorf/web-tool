@@ -55,6 +55,7 @@ $(document).ready(function(){
      }).then(result =>{
             console.log(result);
         });
+    var nsUrl = "http://localhost:1234/"
     $("#sign_btn").click(function(){
        // alert("test")
         var username = $("#email").val();
@@ -69,7 +70,19 @@ $(document).ready(function(){
             console.log(result);
             if(result.data.status == "success"){
                 alert("Login Success");
-                location.href ="/dashboard";
+                //location.reload();
+                axios.get("http://localhost:1234/ns").then(result=>{
+                    console.log(result.data);
+                    data = result.data;
+                })
+                var ns = result.data.nameSpace
+                if(ns){
+                    location.href ="/dashboard";
+                }else{
+                    alert("NameSpace가 등록되어 있지 않습니다.\n등록페이지로 이동합니다.")
+                    location.href ="/NS/reg";
+                }
+                
             }
         });
         // $.ajax({

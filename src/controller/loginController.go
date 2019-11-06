@@ -3,30 +3,15 @@ package controller
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
-	"time"
 
 	echosession "github.com/go-session/echo-session"
 	"github.com/labstack/echo"
 )
 
-type LoginInfo struct {
-	Email string
-	Pass  string
-}
 type ReqInfo struct {
 	UserName string `json:"username"`
 	Password string `json:"password"`
-}
-
-func MakeNameSpace(name string) string {
-	now := time.Now()
-	nanos := strconv.FormatInt(now.UnixNano(), 10)
-
-	result := name + "-" + nanos
-	fmt.Println("makeNameSpace : ", result)
-	return result
 }
 
 func RegUserConrtoller(c echo.Context) error {
@@ -44,9 +29,9 @@ func RegUserConrtoller(c echo.Context) error {
 	get, ok := store.Get(user)
 	fmt.Println(get)
 	obj := map[string]string{
-		"username":  user,
-		"namespace": MakeNameSpace(user),
-		"password":  pass,
+		"username": user,
+		// "namespace": MakeNameSpace(user),
+		"password": pass,
 	}
 	if !ok {
 
@@ -88,12 +73,14 @@ func LoginController(c echo.Context) error {
 			"status":  "fail",
 		})
 	}
-	result := map[string]string{}
-	for k, v := range get.(map[string]string) {
-		fmt.Println(k, v)
-		result[k] = v
+	//result := map[string]string{}
+	result := get.(map[string]string)
+	fmt.Println("result mapping : ", result)
+	// for k, v := range get.(map[string]string) {
+	// 	fmt.Println(k, v)
+	// 	result[k] = v
 
-	}
+	// }
 
 	fmt.Println("result : ", result["password"])
 	if result["password"] == getPass && result["username"] == getUser {
@@ -101,7 +88,8 @@ func LoginController(c echo.Context) error {
 		store.Save()
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"message": "Login Success",
-			"status":  "success",
+			//	"nameSpace": result["namespace"],
+			"status": "success",
 		})
 	} else {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{

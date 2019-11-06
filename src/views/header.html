@@ -24,6 +24,7 @@
                     <li class="nav-item">
                         <select class="form-control form-control-sm">
                             <option>Select nameSpace</option>
+                            <option value="{{.NameSpace}}" selected>{{ .NameSpace}}</option>
                         </select>
                     </li>
                     <li class="nav-item">
@@ -42,7 +43,8 @@
                     </li>
                     <li class="nav-item ">
                         <a class="text-light" href="#">
-                            <strong>홍길동</strong>님
+                            
+                            <strong>{{ .Username }}</strong>님
                             <i class="fas fa-sign-out-alt"></i>
                         </a>
                     </li>

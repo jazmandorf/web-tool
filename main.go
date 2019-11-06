@@ -66,14 +66,24 @@ func main() {
 
 	e.GET("/", func(c echo.Context) error {
 		store := echosession.FromContext(c)
-		get, ok := store.Get("username")
-		fmt.Println(get)
+		getUser, ok := store.Get("username")
+
 		if !ok {
 			fmt.Println("nothing ")
-			return c.Redirect(200, "/login")
-		} else {
-			return c.Redirect(http.StatusAccepted, "/dashboard")
+			//return c.Render(http.StatusNotAcceptable, "login.html", nil)
+			return c.Redirect(http.StatusPermanentRedirect, "/login")
 		}
+		result := map[string]string{}
+		getObj, ok := store.Get(getUser.(string))
+
+		if !ok {
+			//return c.Render(http.StatusPermanentRedirect, "login.html", nil)
+			return c.Redirect(http.StatusPermanentRedirect, "/login")
+		}
+		for k, v := range getObj.(map[string]string) {
+			result[k] = v
+		}
+
 		defer func() {
 			if e := recover(); e != nil {
 				fmt.Printf("error : %s\r\n ", e)
@@ -99,37 +109,56 @@ func main() {
 		// }
 		// fmt.Println("bind :", cInfo[0])
 		// spew.Dump(cInfo)
-		return c.Render(http.StatusOK, "template.html", map[string]interface{}{
-			"name":    "Dolly!",
-			"reverse": 1234,
-		})
+		return c.Render(http.StatusAccepted, "dashboard.html", result)
+
 	})
 
 	e.GET("/hello", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "hello", map[string]interface{}{
+		return c.Render(http.StatusOK, "hello.html", map[string]interface{}{
 			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
 		})
 	})
 
 	e.GET("/dashboard", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "dashboard.html", map[string]interface{}{
-			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
-		})
+		fmt.Println("=========== DashBoard start ==============")
+		if loginInfo := controller.CallLoginInfo(c); loginInfo.NameSpace != "" {
+			return c.Render(http.StatusOK, "dashboard.html", map[string]interface{}{
+				"LoginInfo": loginInfo,
+			})
+
+		}
+
+		return c.Redirect(http.StatusPermanentRedirect, "/login")
+
 	})
 
 	e.POST("/login/proc", controller.LoginController)
 	e.POST("/regUser", controller.RegUserConrtoller)
 
 	e.GET("/MCIS/register", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "MCISRegister.html", map[string]interface{}{
-			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
-		})
+		if loginInfo := controller.CallLoginInfo(c); loginInfo.NameSpace != "" {
+			return c.Render(http.StatusOK, "MCISRegister.html", map[string]interface{}{
+				"LoginInfo": loginInfo,
+			})
+
+		}
+
+		return c.Redirect(http.StatusPermanentRedirect, "/login")
+
 	})
 
 	e.GET("/MCIS/list", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "MCISlist.html", map[string]interface{}{
-			"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
-		})
+		if loginInfo := controller.CallLoginInfo(c); loginInfo.NameSpace != "" {
+			return c.Render(http.StatusOK, "MCISlist.html", map[string]interface{}{
+				"LoginInfo": loginInfo,
+			})
+
+		}
+
+		// return c.Render(http.StatusOK, "MCISlist.html", map[string]interface{}{
+		// 	"Name": myStruct{Name: "Dennis", Age: 36, Height: 170},
+		// })
+		return c.Redirect(http.StatusPermanentRedirect, "/login")
 	})
 
 	e.GET("/initial", func(c echo.Context) error {
@@ -214,6 +243,25 @@ func main() {
 		//return c.HTML(200, string(data))
 		return c.String(http.StatusOK, "gethtml")
 	})
+
+	// e.GET("/ns",func(c echo.Context)error{
+	// 	return c.JSON(StatusOK,map[string][]map[string]string{}{
+	// 		"ns": [
+	// 				{
+	// 					"id": "879f1c57-857e-4430-b904-0cda2c16c580",
+	// 					"name": "Seokho Son Name Space",
+	// 					"description": "description-2019-10-01",
+	// 				},
+	// 				{
+	// 					"id": "bce5fb65-f617-4d45-97b7-f6c299559010",
+	// 					"name": "my name spaced",
+	// 					"description": "description-2019-08-14",
+	// 				},
+	// 			],
+	// 	})
+	// })
+	e.GET("/NS/reg", controller.NsRegForm)
+	e.POST("NS/reg/proc", controller.NsRegController)
 
 	e.Logger.Fatal(e.Start(":1234"))
 
